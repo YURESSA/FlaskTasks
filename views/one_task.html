@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Подробнее о задаче</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Задача № {{ task.task_id }}: {{ task.title }}</h1>
+            </div>
+            <div class="card-body">
+                <p><strong>Описание:</strong> {{ task.description }}</p>
+                <p><strong>Статус задачи:</strong>
+                    <span class="badge badge-{{ 'primary' if task.status == 'in-progress' else 'success' if task.status == 'completed' else 'secondary' }}">
+                        {{ task.status }}
+                    </span>
+                </p>
+                <p><strong>Приоритет:</strong>
+                    <span class="badge badge-{{ 'info' if task.priority == 'light' else 'warning' if task.priority == 'medium' else 'danger' }}">
+                        {{ task.priority }}
+                    </span>
+                </p>
+            </div>
+            <div class="card-footer">
+                <a href="{{ url_for('edit_task', task_id=task.task_id) }}" class="btn btn-info">Редактировать задачу</a>
+                <a href="{{ url_for('get_filtered_tasks')}}" class="btn btn-secondary">Вернуться ко всем задачам</a>
+                <a href="{{ url_for('next_task', current_task_id=task.task_id) }}" class="btn btn-primary">Следующая задача</a>
+                <form method="post" action="{{ url_for('delete_task', task_id=task.task_id) }}" style="display:inline;">
+                    <button type="submit" class="btn btn-danger" onclick="return confirm('Вы уверенны, что хотите удалить данную задачу?')">Удалить задачу</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

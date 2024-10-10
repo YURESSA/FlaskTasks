@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все задачи</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Фильтр задач</h1>
+        <a href="{{ url_for('create_task') }}" class="btn btn-primary mb-3">Создать новую задачу</a>
+        <form method="get" action="/tasks" class="form-inline my-3">
+            <div class="form-group mr-3">
+                <label for="status" class="mr-2">Статус</label>
+                <select name="status" id="status" class="form-control">
+                    <option value=""{% if not selected_status %}selected{% endif %}>Все</option>
+                     <option value="not-started" {% if selected_status == 'not-started' %}selected{% endif %}>Не начаты</option>
+                    <option value="in-progress"{% if selected_status == 'in-progress' %}selected{% endif %}>В работе</option>
+                    <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Завершённые</option>
+                </select>
+            </div>
+            <div class="form-group mr-3">
+                <label for="priority" class="mr-2">Приоритет</label>
+                <select name="priority" id="priority" class="form-control">
+                    <option value="" {% if not selected_priority %}selected{% endif %}>Все</option>
+                    <option value="light"{% if selected_priority == 'light' %}selected{% endif %}>Низкий</option>
+                    <option value="medium"{% if selected_priority == 'medium' %}selected{% endif %}>Средний</option>
+                    <option value="high"{% if selected_priority == 'high' %}selected{% endif %}>Высокий</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Найти</button>
+        </form>
+
+        <div class="list-group">
+            {% for task in tasks %}
+            <a href="{{ url_for('get_task', task_id=task.task_id) }}" class="list-group-item list-group-item-action">
+                <h5 class="mb-1">Задача № {{ task.task_id }}: {{ task.title }}</h5>
+                <p class="mb-1">{{ task.description }}</p>
+                <p>Статус: <small class="badge badge-{{ 'primary' if task.status == 'in-progress' else 'success' if task.status == 'completed' else 'secondary' }}">{{ task.status }} </small>|
+                    Приоритет: <small class="badge badge-{{ 'info' if task.priority == 'light' else 'warning' if task.priority == 'medium' else 'danger' }}">{{ task.priority }}</small></p>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

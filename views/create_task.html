@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создание новой задачиk</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Создать новую задачу</h1>
+        <form method="post" action="/create-task">
+            <div class="form-group">
+                <label for="title">Название задачи</label>
+                <input type="text" class="form-control" id="title" name="title" placeholder="Enter task title" required>
+            </div>
+            <div class="form-group">
+                <label for="description">Описание задачи</label>
+                <textarea class="form-control" id="description" name="description" rows="3" placeholder="Enter task description" required></textarea>
+            </div>
+            <div class="form-group">
+                <label for="status">Статус</label>
+                <select class="form-control" id="status" name="status" required>
+                    <option value="not-started">Not Started</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="priority">Приоритет</label>
+                <select class="form-control" id="priority" name="priority" required>
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Создать задачу</button>
+            <a href="/tasks" class="btn btn-secondary">Отменить</a>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
