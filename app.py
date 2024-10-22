@@ -111,8 +111,7 @@ def get_filtered_tasks():
 
 @app.route('/next-task/<int:current_task_id>')
 def next_task(current_task_id):
-    tasks = task_manager.load_tasks()
-    task_ids = sorted([task.task_id for task in tasks])
+    task_ids = task_manager.get_all_tasks_ids()
     current_index = task_ids.index(current_task_id) if current_task_id in task_ids else -1
     if current_index != -1:
         next_task_id = task_ids[(current_index + 1) % len(task_ids)]

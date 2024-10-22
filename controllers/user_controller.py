@@ -1,26 +1,26 @@
-import json
-import os
-import re
+import sqlite3
 import bcrypt
+import os
 
 
 class UserManager:
-    def __init__(self, users_file='data/users.json'):
-        self.users_file = users_file
-        self.users = self.load_users()
+    def __init__(self, db_name='flask-users.db3'):
+        self.db_name = db_name
+        self.create_table()
 
-    def load_users(self):
-        if os.path.exists(self.users_file):
-            with open(self.users_file, 'r') as file:
-                try:
-                    return json.load(file)
-                except json.JSONDecodeError:
-                    return {}
-        return {}
+    def create_table(self):
+        with self.get_connection() as connection:
+            cursor = connection.cursor()
+            cursor.execute('''
+                CREATE TABLE IF NOT EXISTS users (
+                    username TEXT PRIMARY KEY,
+                    password TEXT NOT NULL
+                )
+            ''')
+            connection.commit()
 
-    def save_users(self):
-        with open(self.users_file, 'w') as file:
-            json.dump(self.users, file, indent=4)
+    def get_connection(self):
+        return sqlite3.connect(self.db_name)
 
     def hash_password(self, password):
         salt = bcrypt.gensalt()
@@ -30,27 +30,40 @@ class UserManager:
         return bcrypt.checkpw(provided_password.encode('utf-8'), stored_password.encode('utf-8'))
 
     def is_password_strong(self, password):
-
-
         return True, "Пароль достаточно сложный."
 
     def register_user(self, username, password1, password2):
-        if username in self.users:
-            return False, 'Имя пользователя уже занято!'
-        if password1 != password2:
-            return False, 'Пароли не совпадают!'
+        with self.get_connection() as connection:
+            cursor = connection.cursor()
 
-        is_strong, message = self.is_password_strong(password1)
-        if not is_strong:
-            return False, message
-        self.users[username] = self.hash_password(password1)
-        self.save_users()
-        return True, 'Пользователь успешно зарегистрирован!'
+            if self.user_exists(username, cursor):
+                return False, 'Имя пользователя уже занято!'
+            if password1 != password2:
+                return False, 'Пароли не совпадают!'
+
+            is_strong, message = self.is_password_strong(password1)
+            if not is_strong:
+                return False, message
+
+            hashed_password = self.hash_password(password1)
+            cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_password))
+            connection.commit()
+            return True, 'Пользователь успешно зарегистрирован!'
+
+    def user_exists(self, username, cursor):
+        cursor.execute('SELECT COUNT(*) FROM users WHERE username = ?', (username,))
+        return cursor.fetchone()[0] > 0
 
     def login_user(self, username, password):
-        if username not in self.users:
-            return False, 'Пользователь не найден!'
-        if not self.check_password(self.users[username], password):
-            return False, 'Неверный пароль!'
+        with self.get_connection() as connection:
+            cursor = connection.cursor()
+            cursor.execute('SELECT password FROM users WHERE username = ?', (username,))
+            result = cursor.fetchone()
 
-        return True, 'Вход выполнен успешно!'
+            if result is None:
+                return False, 'Пользователь не найден!'
+            stored_password = result[0]
+            if not self.check_password(stored_password, password):
+                return False, 'Неверный пароль!'
+
+            return True, 'Вход выполнен успешно!'
